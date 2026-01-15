@@ -1,0 +1,149 @@
+managed implementation in class zbp_dd_r_inct_ymir unique;
+strict ( 2 );
+with draft;
+define behavior for ZDD_R_INCT_YMIR alias Indicent
+persistent table zdt_inct_ymir
+draft table zdtinct_ymir_d
+etag master LocalLastChangedAt
+lock master total etag LastChangedAt
+authorization master ( global, instance )
+{
+
+  association _History { create; with draft; }
+    field ( readonly )
+
+   IncUUID,
+
+   LocalCreatedBy,
+
+   LocalCreatedAt,
+
+   LocalLastChangedBy,
+
+   LocalLastChangedAt,
+
+   LastChangedAt;
+
+
+
+  field ( numbering : managed )
+
+   IncUUID;
+
+
+
+  create;
+
+  update;
+
+  delete;
+
+   draft action Activate optimized;
+
+  draft action Discard;
+
+  draft action Edit;
+
+  draft action Resume;
+
+  draft determine action Prepare;
+
+
+
+  mapping for ZDT_INCT_YMIR corresponding
+
+  {
+
+    IncUUID = inc_uuid;
+
+    IncidentID = incident_id;
+
+    Title = title;
+
+    Description = description;
+
+    Status = status;
+
+    Priority = priority;
+
+    CreationDate = creation_date;
+
+    ChangedDate = changed_date;
+
+    LocalCreatedBy = local_created_by;
+
+    LocalCreatedAt = local_created_at;
+
+    LocalLastChangedBy = local_last_changed_by;
+
+    LocalLastChangedAt = local_last_changed_at;
+
+    LastChangedAt = last_changed_at;
+
+
+
+  }
+
+}
+
+define behavior for ZDD_INCT_H_YMIR alias History
+persistent table zdt_inct_h_ymir
+draft table zdtinct_h_ymir_d
+lock dependent by _Incident
+authorization dependent by _Incident
+etag master LocalLastChangedAt
+{
+   update;
+
+  delete;
+
+
+
+  // Mapeo de campos entre la Vista CDS y la Tabla de Base de Datos
+
+  mapping for zdt_inct_h_ymir
+
+  {
+
+    HisUUID            = his_uuid;
+
+    IncUUID            = inc_uuid;
+
+    HisID              = his_id;
+
+    PreviousStatus     = previous_status;
+
+    NewStatus          = new_status;
+
+    Text               = text;
+
+    LocalCreatedBy     = local_created_by;
+
+    LocalCreatedAt     = local_created_at;
+
+    LocalLastChangedBy = local_last_changed_by;
+
+    LocalLastChangedAt = local_last_changed_at;
+
+    LastChangedAt      = last_changed_at;
+
+  }
+
+
+
+  // Asociación para regresar al padre
+
+  association _Incident { with draft; }
+
+
+
+  // Determinar automáticamente el UUID de la clave si no lo envía el UI
+
+  field ( readonly, numbering : managed ) HisUUID;
+
+
+
+  // El ID del padre debe ser solo lectura para el hijo, se hereda al crear
+
+  field ( readonly ) IncUUID;
+}

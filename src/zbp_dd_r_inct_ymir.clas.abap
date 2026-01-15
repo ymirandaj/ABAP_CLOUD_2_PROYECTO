@@ -1,0 +1,5 @@
+CLASS zbp_dd_r_inct_ymir DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF zdd_r_inct_ymir.
+ENDCLASS.
+
+CLASS zbp_dd_r_inct_ymir IMPLEMENTATION.
+ENDCLASS.

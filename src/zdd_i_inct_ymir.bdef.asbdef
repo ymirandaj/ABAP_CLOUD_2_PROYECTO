@@ -1,0 +1,16 @@
+interface;
+use draft;
+
+define behavior for ZDD_I_INCT_YMIR alias Indicent
+{
+  use create;
+  use update;
+  use delete;
+
+  use action Activate;
+  use action Discard;
+  use action Edit;
+  use action Resume;
+  use action Prepare;
+
+}

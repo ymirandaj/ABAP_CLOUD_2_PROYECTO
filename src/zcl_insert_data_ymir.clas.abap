@@ -18,8 +18,11 @@ ENDCLASS.
 CLASS zcl_insert_data_ymir IMPLEMENTATION.
   METHOD if_oo_adt_classrun~main.
 
-    insert_statuses( out ).
-    insert_priorities( out ).
+    "insert_statuses( out ).
+    "insert_priorities( out ).
+
+    delete from  zdtinct_h_ymir_d.
+    delete from  zdtinct_ymir_d.
 
 
   ENDMETHOD.
