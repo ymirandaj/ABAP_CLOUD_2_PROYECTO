@@ -1,7 +1,7 @@
 managed implementation in class zbp_dd_r_inct_ymir unique;
 strict ( 2 );
 with draft;
-define behavior for ZDD_R_INCT_YMIR alias Indicent
+define behavior for ZDD_R_INCT_YMIR alias Incident
 persistent table zdt_inct_ymir
 draft table zdtinct_ymir_d
 etag master LocalLastChangedAt
@@ -31,6 +31,7 @@ authorization master ( global, instance )
    IncUUID;
 
 
+  field (readonly ) IncidentId, CreationDate, Status;
 
   create;
 
@@ -38,7 +39,11 @@ authorization master ( global, instance )
 
   delete;
 
-   draft action Activate optimized;
+
+  determination setInitialValues on modify { create; }
+  determination createInitialHistory on save { create; }
+
+  draft action Activate optimized;
 
   draft action Discard;
 
@@ -140,10 +145,6 @@ etag master LocalLastChangedAt
   // Determinar automáticamente el UUID de la clave si no lo envía el UI
 
   field ( readonly, numbering : managed ) HisUUID;
+  field(readonly ) IncUUID, HisId;
 
-
-
-  // El ID del padre debe ser solo lectura para el hijo, se hereda al crear
-
-  field ( readonly ) IncUUID;
 }

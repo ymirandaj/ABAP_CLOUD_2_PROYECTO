@@ -1,7 +1,7 @@
 interface;
 use draft;
 
-define behavior for ZDD_I_INCT_YMIR alias Indicent
+define behavior for ZDD_I_INCT_YMIR alias Incident
 {
   use create;
   use update;

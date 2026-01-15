@@ -10,8 +10,14 @@ as projection on ZDD_R_INCT_YMIR
     IncidentId,
     Title,
     Description,
+    
+    @ObjectModel.text.element: [ 'StatusDescription' ]
     Status,
+    
+    _Status.StatusDescription  as StatusDescription,
+    @ObjectModel.text.element: [ 'PriorityDescription' ]
     Priority,
+    _Priority.PriorityDescription as PriorityDescription,
     CreationDate,
     ChangedDate,
     LocalCreatedBy,

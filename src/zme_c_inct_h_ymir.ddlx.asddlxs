@@ -28,13 +28,14 @@ annotate entity ZDD_C_INCT_H_YMIR
   @UI: { lineItem:       [ { position: 30, importance: #HIGH } ],
          identification: [ { position: 30 } ] }
   HisId;
-  @UI: { lineItem:       [ { position: 40, importance: #MEDIUM } ],
+  @UI: { 
+         lineItem:       [ { position: 40, importance: #MEDIUM, label: 'Previous Status' } ],
          identification: [ { position: 40 } ] }
   PreviousStatus;
-  @UI: { lineItem:       [ { position: 50, importance: #LOW } ],
+  @UI: { lineItem:       [ { position: 50, importance: #LOW, label: 'Next Status'  } ],
          identification: [ { position: 50 } ] }
   NewStatus;
-  @UI: { lineItem:       [ { position: 60, importance: #LOW } ],
+  @UI: { lineItem:       [ { position: 60, importance: #LOW} ],
          identification: [ { position: 60 } ] }
   Text;
   @UI.hidden:true

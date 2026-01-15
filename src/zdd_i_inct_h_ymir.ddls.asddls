@@ -11,10 +11,15 @@ as projection on ZDD_INCT_H_YMIR
     PreviousStatus,
     NewStatus,
     Text,
+     @Semantics.user.createdBy: true
     LocalCreatedBy,
+     @Semantics.systemDateTime.createdAt: true
     LocalCreatedAt,
+    @Semantics.user.localInstanceLastChangedBy: true
     LocalLastChangedBy,
+    @Semantics.systemDateTime.localInstanceLastChangedAt: true
     LocalLastChangedAt,
+    @Semantics.systemDateTime.lastChangedAt: true
     LastChangedAt,
     /* Associations */
     _Incident,

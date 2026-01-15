@@ -3,7 +3,7 @@
                      typeNamePlural: 'Incidents',
                      title:          { type: #STANDARD,
                                        label: 'Incidents',
-                                       value: 'IncidentId' } },
+                                       value: 'Title' } },
              presentationVariant: [{ sortOrder: [{ by: 'IncidentId',
                                           direction: #ASC }],
                               visualizations: [{ type: #AS_LINEITEM }] }] }
@@ -63,10 +63,13 @@ annotate entity ZDD_C_INCT_YMIR
     entity.element: 'StatusCode',
     useForValidation: true
   } ]
-  @UI: {lineItem: [{ position: 50,
+  @UI: {    lineItem: [{ position: 50,
                importance: #LOW }],
-  identification: [{ position: 50  } ],
-  selectionField: [{ position: 50 }]}
+            identification: [{ position: 50  } ],
+                selectionField: [{ position: 50 }],
+              textArrangement: #TEXT_ONLY
+  }
+  
   Status;
 
   @Consumption.valueHelpDefinition: [ {
@@ -77,7 +80,8 @@ annotate entity ZDD_C_INCT_YMIR
   @UI: {lineItem: [{ position: 60,
                importance: #LOW }],
   identification: [{ position: 60  } ],
-  selectionField: [{ position: 60 }]}
+  selectionField: [{ position: 60 }],
+              textArrangement: #TEXT_ONLY}
   Priority;
 
   @UI: {lineItem: [{ position: 70,

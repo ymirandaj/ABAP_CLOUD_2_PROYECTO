@@ -14,10 +14,15 @@ as projection on ZDD_R_INCT_YMIR
     Priority,
     CreationDate,
     ChangedDate,
+     @Semantics.user.createdBy: true
     LocalCreatedBy,
+     @Semantics.systemDateTime.createdAt: true
     LocalCreatedAt,
+    @Semantics.user.localInstanceLastChangedBy: true
     LocalLastChangedBy,
+    @Semantics.systemDateTime.localInstanceLastChangedAt: true
     LocalLastChangedAt,
+    @Semantics.systemDateTime.lastChangedAt: true
     LastChangedAt,
     /* Associations */
     _History,
