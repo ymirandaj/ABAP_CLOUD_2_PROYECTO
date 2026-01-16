@@ -17,13 +17,14 @@
 @VDM.viewType: #BASIC
 
 
-define view entity ZDD_PRIORITY_VH_YMIR as select from zdt_priority_ym
+define view entity ZDD_PRIORITY_VH_YMIR
+  as select from zdt_priority_ym
 {
-    @ObjectModel.text.element: [ 'PriorityDescription' ]
-    key priority_code as PriorityCode,
-    
-    @Search.defaultSearchElement: true
-    @Search.fuzzinessThreshold: 0.8
-    @Semantics.text: true
-    priority_description as PriorityDescription
+      @ObjectModel.text.element: [ 'PriorityDescription' ]
+  key priority_code        as PriorityCode,
+
+      @Search.defaultSearchElement: true
+      @Search.fuzzinessThreshold: 0.8
+      @Semantics.text: true
+      priority_description as PriorityDescription
 }

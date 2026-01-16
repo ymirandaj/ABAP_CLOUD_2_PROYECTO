@@ -8,7 +8,7 @@ association [1..1] to ZDD_STATUS_VH_YMIR as _StatusPrevius on _StatusPrevius.Sta
 association [1..1] to ZDD_STATUS_VH_YMIR as _StatusNext on _StatusNext.StatusCode = $projection.NewStatus
 {
     key his_uuid as HisUuid,
-    key inc_uuid as IncUuid,
+    inc_uuid as IncUuid,
     his_id as HisId,
     previous_status as PreviousStatus,
     new_status as NewStatus,

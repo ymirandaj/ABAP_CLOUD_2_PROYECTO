@@ -6,7 +6,7 @@ provider contract transactional_interface
 as projection on ZDD_INCT_H_YMIR
 {
     key HisUuid,
-    key IncUuid,
+     IncUuid,
     HisId,
     PreviousStatus,
     NewStatus,

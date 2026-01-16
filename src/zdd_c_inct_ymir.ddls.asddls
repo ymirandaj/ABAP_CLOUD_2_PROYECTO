@@ -17,6 +17,7 @@ as projection on ZDD_R_INCT_YMIR
     _Status.StatusDescription  as StatusDescription,
     @ObjectModel.text.element: [ 'PriorityDescription' ]
     Priority,
+    
     _Priority.PriorityDescription as PriorityDescription,
     CreationDate,
     ChangedDate,

@@ -48,8 +48,7 @@ annotate entity ZDD_C_INCT_YMIR
   @UI: {lineItem: [{ position: 30,
                importance: #LOW }],
   identification: [{ position: 30  } ] }
-//  selectionField: [{ position: 30 }]
-//  @UI.hidden: true
+
   Title;
 
   @UI: {lineItem: [{ position: 40,
@@ -59,13 +58,14 @@ annotate entity ZDD_C_INCT_YMIR
   Description;
 
   @Consumption.valueHelpDefinition: [ {
-    entity.name: 'zdd_status_vh_ymir',
-    entity.element: 'StatusCode',
-    useForValidation: true
+                    entity.name: 'zdd_status_vh_ymir',
+                    entity.element: 'StatusCode',
+                    useForValidation: true
   } ]
   @UI: {    lineItem: [{ position: 50,
-               importance: #LOW }],
-            identification: [{ position: 50  } ],
+               importance: #LOW,
+               label: 'Status' }],
+            identification: [{ position: 50, importance: #LOW, label: 'Status'  } ],
                 selectionField: [{ position: 50 }],
               textArrangement: #TEXT_ONLY
   }
@@ -75,11 +75,12 @@ annotate entity ZDD_C_INCT_YMIR
   @Consumption.valueHelpDefinition: [ {
     entity.name: 'zdd_priority_vh_ymir',
     entity.element: 'PriorityCode',
-    useForValidation: true
+    useForValidation: true, label: 'Priority'
   } ]
   @UI: {lineItem: [{ position: 60,
-               importance: #LOW }],
-  identification: [{ position: 60  } ],
+               importance: #LOW,
+               label: 'Priority' }],
+  identification: [{ position: 60, importance: #LOW, label: 'Priority'  } ],
   selectionField: [{ position: 60 }],
               textArrangement: #TEXT_ONLY}
   Priority;
@@ -91,8 +92,10 @@ annotate entity ZDD_C_INCT_YMIR
   CreationDate;
 
   @UI: {lineItem: [{ position: 80,
-               importance: #LOW }],
-  identification: [{ position: 80  } ],
+                    importance: #LOW,
+                    label: 'Changed Date' }],
+  identification: [{ position: 80,importance: #LOW,
+                    label: 'Changed Date'   } ],
   selectionField: [{ position: 80 }]}
   ChangedDate;
 

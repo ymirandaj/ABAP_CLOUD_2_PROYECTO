@@ -6,7 +6,7 @@ define view entity ZDD_C_INCT_H_YMIR
  as projection on ZDD_INCT_H_YMIR
 {
     key HisUuid,
-    key IncUuid,
+     IncUuid,
     HisId,
     PreviousStatus,
     NewStatus,
