@@ -2,10 +2,10 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'CDS history incidents'
 @Metadata.ignorePropagatedAnnotations: true
-define view entity ZDD_INCT_H_YMIR as select from zdt_inct_h_ymir
+define  view entity ZDD_INCT_H_YMIR as select from zdt_inct_h_ymir
 association to parent ZDD_R_INCT_YMIR as _Incident on _Incident.IncUuid = $projection.IncUuid
-association [1..1] to ZDD_STATUS_VH_YMIR as _StatusPrevius on _StatusPrevius.StatusCode = $projection.PreviousStatus
-association [1..1] to ZDD_STATUS_VH_YMIR as _StatusNext on _StatusNext.StatusCode = $projection.NewStatus
+association [0..1] to ZDD_STATUS_VH_YMIR as _StatusPrevius on _StatusPrevius.StatusCode = $projection.PreviousStatus
+association [0..1] to ZDD_STATUS_VH_YMIR as _StatusNext on _StatusNext.StatusCode = $projection.NewStatus
 {
     key his_uuid as HisUuid,
     inc_uuid as IncUuid,
