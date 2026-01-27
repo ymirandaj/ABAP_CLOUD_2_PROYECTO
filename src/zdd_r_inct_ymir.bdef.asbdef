@@ -51,11 +51,9 @@
         result [1] $self;
       side effects
       {
-        action changeStatus affects entity _History;
+        action changeStatus affects entity _History , $self;
 
       }
-
-
       determination setInitialValues on modify { create; }
       determination createInitialHistory on save { create; }
 

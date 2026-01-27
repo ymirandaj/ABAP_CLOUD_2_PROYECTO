@@ -194,55 +194,97 @@ CLASS lhc_Indicent IMPLEMENTATION.
     ).
   ENDMETHOD.
 
+*
+*  METHOD changeStatus.
+*
+*    READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*        ENTITY Incident
+*          FIELDS ( Status ) WITH CORRESPONDING #( keys )
+*        RESULT DATA(incidents).
+*
+*    LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
+*
+*
+*      DATA(ls_status_param) = keys[ KEY id %tky = <incident>-%tky ]-%param.
+*
+*
+*      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*        ENTITY Incident
+*          UPDATE FIELDS ( Status )
+*          WITH VALUE #( ( %tky   = <incident>-%tky
+*                          Status = ls_status_param-status ) ).
+*
+*
+*
+*
+*      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*        ENTITY Incident
+*          CREATE BY \_History
+*          FIELDS ( PreviousStatus NewStatus Text HisId )
+*          WITH VALUE #( ( %tky    = <incident>-%tky
+*                          %target = VALUE #( ( %cid           = 'NEW_HIST_ENTRY'
+*                                               HisId    = get_next_history_id( <incident>-IncUUID )
+*                                               PreviousStatus = <incident>-Status
+*                                               NewStatus      = ls_status_param-status
+*                                               Text           = ls_status_param-text ) ) ) ).
+*    ENDLOOP.
+*
+*
+*    READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*      ENTITY Incident
+*        ALL FIELDS WITH CORRESPONDING #( keys )
+*      RESULT DATA(updated_incidents).
+*
+*    result = VALUE #( FOR inc IN updated_incidents
+*                       ( %tky = inc-%tky %param = inc ) ).
+*
+*
+*
+*  ENDMETHOD.
 
-  METHOD changeStatus.
-
+ METHOD changeStatus.
+    " 1. Leer incidentes actuales (incluyendo IncUuid para historial)
     READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
         ENTITY Incident
-          FIELDS ( Status ) WITH CORRESPONDING #( keys )
+          FIELDS ( Status IncUuid ) WITH CORRESPONDING #( keys )
         RESULT DATA(incidents).
-
+    " 2. Procesar cada incidente
     LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
-
-
+      " 2.1 Obtener parámetros de la acción
       DATA(ls_status_param) = keys[ KEY id %tky = <incident>-%tky ]-%param.
-
-
+      " 2.2 Guardar el estado ANTES de actualizar (PreviousStatus)
+      "     CORRECCIÓN: Guardar en variable explícita para evitar problemas
+      DATA(lv_previous_status) = <incident>-Status.
+      " 2.3 Actualizar estado del incidente
       MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
         ENTITY Incident
           UPDATE FIELDS ( Status )
           WITH VALUE #( ( %tky   = <incident>-%tky
                           Status = ls_status_param-status ) ).
-
-
-
-
+      " 2.4 Crear entrada en historial
       MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
         ENTITY Incident
           CREATE BY \_History
           FIELDS ( PreviousStatus NewStatus Text HisId )
           WITH VALUE #( ( %tky    = <incident>-%tky
                           %target = VALUE #( ( %cid           = 'NEW_HIST_ENTRY'
-                                               HisId    = get_next_history_id( <incident>-IncUUID )
-                                               PreviousStatus = <incident>-Status
+                                               HisId          = get_next_history_id( <incident>-IncUUID )
+                                               PreviousStatus = lv_previous_status
                                                NewStatus      = ls_status_param-status
                                                Text           = ls_status_param-text ) ) ) ).
     ENDLOOP.
-
-
+    " 3. Leer incidentes actualizados
     READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
       ENTITY Incident
         ALL FIELDS WITH CORRESPONDING #( keys )
-      RESULT DATA(updated_incidents).
-
+    RESULT DATA(updated_incidents).
+    " 4. Construir resultado (solo incidente)
+    "     NOTA: El side effect en el BDEF indica que _History debe recargarse
+    "     Fiori Elements debería interpretar esto automáticamente
     result = VALUE #( FOR inc IN updated_incidents
-                       ( %tky = inc-%tky %param = inc ) ).
-
-
-
+                       ( %tky = inc-%tky
+                         %param = inc ) ).
   ENDMETHOD.
-
-
 
   METHOD get_next_incident_id.
 
