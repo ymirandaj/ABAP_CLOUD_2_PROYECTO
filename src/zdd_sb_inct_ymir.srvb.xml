@@ -4,30 +4,30 @@
   <asx:values>
    <SRVB>
     <METADATA>
-     <NAME>ZSB_INCT_YMIR</NAME>
+     <NAME>ZDD_SB_INCT_YMIR</NAME>
      <TYPE>SRVB/SVB</TYPE>
-     <DESCRIPTION>sERVICE BINDIG DE LOS INCIDENTES</DESCRIPTION>
+     <DESCRIPTION>Incidents service bindig</DESCRIPTION>
      <LANGUAGE>EN</LANGUAGE>
      <MASTER_LANGUAGE>EN</MASTER_LANGUAGE>
      <ABAP_LANGU_VERSION>5</ABAP_LANGU_VERSION>
     </METADATA>
     <CONTENT>
      <BIND_TYPE_IMPL>
-      <NAME>ZSB_INCT_YMIR</NAME>
+      <NAME>ZDD_SB_INCT_YMIR</NAME>
      </BIND_TYPE_IMPL>
      <BIND_TYPE>ODATA</BIND_TYPE>
      <BIND_TYPE_VERSION>V4</BIND_TYPE_VERSION>
      <SERVICES>
       <item>
-       <SERVICE_NAME>ZSD_INCT_YMIR</SERVICE_NAME>
+       <SERVICE_NAME>ZDD_SD_INCT_YMIR</SERVICE_NAME>
        <SERVICE_CONTENT>
         <item>
          <SERVICE_VERSION>0001</SERVICE_VERSION>
          <RELEASE_STATE>NOT_RELEASED</RELEASE_STATE>
          <SRVD_REF>
-          <URI>/sap/bc/adt/ddic/srvd/sources/zsd_inct_ymir</URI>
+          <URI>/sap/bc/adt/ddic/srvd/sources/zdd_sd_inct_ymir</URI>
           <TYPE>SRVD/SRV</TYPE>
-          <NAME>ZSD_INCT_YMIR</NAME>
+          <NAME>ZDD_SD_INCT_YMIR</NAME>
          </SRVD_REF>
          <BIND_TYPE_DATA>
           <CONTENT>

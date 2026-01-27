@@ -14,5 +14,4 @@ define behavior for ZDD_I_INCT_YMIR alias Incident
   use action Prepare;
 
   use action changeStatus;
-
 }
