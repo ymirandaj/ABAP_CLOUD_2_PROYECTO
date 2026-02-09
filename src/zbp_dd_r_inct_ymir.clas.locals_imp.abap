@@ -200,75 +200,131 @@ CLASS lhc_Indicent IMPLEMENTATION.
     ).
   ENDMETHOD.
 
+*
+*  METHOD changeStatus.
+*
+*
+*
+*
+*    READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*    ENTITY Incident
+*    FIELDS ( Status )
+*    WITH CORRESPONDING #( keys )
+*    RESULT DATA(incidents).
+*
+*
+*
+*
+*    LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
+*
+*      "PARAMETROS DE STATUS
+*
+*      DATA(ls_status_param) = keys[ KEY id %tky = <incident>-%tky ]-%param.
+*
+*      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*       ENTITY Incident
+*         UPDATE FIELDS ( Status )
+*         WITH VALUE #( ( %tky   = <incident>-%tky
+*                         Status = ls_status_param-status ) ).
+*
+*
+*
+*
+*      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*            ENTITY Incident
+*              CREATE BY \_History
+*              FIELDS ( PreviousStatus NewStatus Text HisId )
+*              WITH VALUE #( ( %tky    = <incident>-%tky
+*                              %target = VALUE #( (
+*                                                   %cid           = 'NEW_HIST_ENTRY'
+*                                                   HisId    = get_next_history_id( <incident>-IncUUID )
+*                                                   PreviousStatus = <incident>-Status
+*                                                   NewStatus      = ls_status_param-status
+*                                                   Text           = ls_status_param-text ) ) ) )
+*
+*      MAPPED DATA(lt_mapped_local)
+*        FAILED DATA(lt_failed_local)
+*        REPORTED DATA(lt_reported_local).
+*
+*
+*
+*
+*      APPEND LINES OF lt_failed_local-incident TO failed-incident.
+*      APPEND LINES OF lt_reported_local-incident TO reported-incident.
+*   mapped-history = VALUE #( FOR <line> IN lt_mapped_local-history (
+*    %tky = <line>-%tky
+*) ).
+*
+*      APPEND LINES OF lt_reported_local-history TO reported-history.
+*
+*    ENDLOOP.
+*
+*    READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*         ENTITY Incident
+*           ALL FIELDS WITH CORRESPONDING #( keys )
+*         RESULT DATA(updated_incidents).
+*
+*    result = VALUE #( FOR inc IN updated_incidents
+*                       ( %tky = inc-%tky %param = inc ) ).
+*
+*
+*  ENDMETHOD.
 
-  METHOD changeStatus.
-
-
-
-
-    READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+METHOD changeStatus.
+  " 1. Leer los incidentes actuales
+  READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
     ENTITY Incident
-    FIELDS ( Status )
+    FIELDS ( Status IncUUID ) " IncUUID es necesario para tu método get_next_history_id
     WITH CORRESPONDING #( keys )
     RESULT DATA(incidents).
 
+  LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
+    " Obtener parámetros de la acción para esta clave específica
+    DATA(ls_status_param) = keys[ KEY id %tky = <incident>-%tky ]-%param.
 
-
-
-    LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
-
-      "PARAMETROS DE STATUS
-
-      DATA(ls_status_param) = keys[ KEY id %tky = <incident>-%tky ]-%param.
-
-      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-       ENTITY Incident
-         UPDATE FIELDS ( Status )
-         WITH VALUE #( ( %tky   = <incident>-%tky
-                         Status = ls_status_param-status ) ).
-
-
-
-
-      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-            ENTITY Incident
-              CREATE BY \_History
-              FIELDS ( PreviousStatus NewStatus Text HisId )
-              WITH VALUE #( ( %tky    = <incident>-%tky
-                              %target = VALUE #( (
-                                                   %cid           = 'NEW_HIST_ENTRY'
-                                                   HisId    = get_next_history_id( <incident>-IncUUID )
-                                                   PreviousStatus = <incident>-Status
-                                                   NewStatus      = ls_status_param-status
-                                                   Text           = ls_status_param-text ) ) ) )
-
+    " 2. Actualizar estatus y Crear Historial en una sola llamada MODIFY (Más eficiente)
+    MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+      ENTITY Incident
+        UPDATE FIELDS ( Status )
+        WITH VALUE #( ( %tky = <incident>-%tky Status = ls_status_param-status ) )
+      ENTITY Incident
+        CREATE BY \_History
+        FIELDS ( PreviousStatus NewStatus Text HisId )
+        WITH VALUE #( ( %tky    = <incident>-%tky
+                        %target = VALUE #( (
+                                  " CID único usando el índice del loop para evitar errores
+                                  %cid           = |HIST_{ sy-tabix }|
+                                  HisId          = get_next_history_id( <incident>-IncUUID )
+                                  PreviousStatus = <incident>-Status
+                                  NewStatus      = ls_status_param-status
+                                  Text           = ls_status_param-text ) ) ) )
       MAPPED DATA(lt_mapped_local)
-        FAILED DATA(lt_failed_local)
-        REPORTED DATA(lt_reported_local).
+      FAILED DATA(lt_failed_local)
+      REPORTED DATA(lt_reported_local).
 
+    " 3. Mapear errores y respuestas
+    " Importante: recolectar de ambas entidades (Incident y History)
+    INSERT LINES OF lt_failed_local-incident   INTO TABLE failed-incident.
+    INSERT LINES OF lt_failed_local-history    INTO TABLE failed-history.
+    INSERT LINES OF lt_reported_local-incident INTO TABLE reported-incident.
+    INSERT LINES OF lt_reported_local-history  INTO TABLE reported-history.
 
+    " Mapear el historial creado para el framework
+    INSERT LINES OF lt_mapped_local-history    INTO TABLE mapped-history.
+  ENDLOOP.
 
-
-      APPEND LINES OF lt_failed_local-incident TO failed-incident.
-      APPEND LINES OF lt_reported_local-incident TO reported-incident.
-   mapped-history = VALUE #( FOR <line> IN lt_mapped_local-history (
-    %tky = <line>-%tky
-) ).
-
-      APPEND LINES OF lt_reported_local-history TO reported-history.
-
-    ENDLOOP.
-
+  " 4. Leer los datos actualizados para devolver el resultado a la UI
+  IF failed-incident IS INITIAL.
     READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-         ENTITY Incident
-           ALL FIELDS WITH CORRESPONDING #( keys )
-         RESULT DATA(updated_incidents).
+      ENTITY Incident
+      ALL FIELDS WITH CORRESPONDING #( keys )
+      RESULT DATA(updated_incidents).
 
     result = VALUE #( FOR inc IN updated_incidents
-                       ( %tky = inc-%tky %param = inc ) ).
+                     ( %tky = inc-%tky %param = inc ) ).
+  ENDIF.
+ENDMETHOD.
 
-
-  ENDMETHOD.
 
   METHOD get_next_incident_id.
 

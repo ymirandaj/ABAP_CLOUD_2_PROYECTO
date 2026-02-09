@@ -2,7 +2,7 @@ projection;
 strict ( 2 );
 use draft;
 
-define behavior for ZDD_C_INCT_YMIR //alias <alias_name>
+define behavior for ZDD_C_INCT_YMIR alias Incident
 {
   use create;
   use update;
@@ -16,10 +16,16 @@ define behavior for ZDD_C_INCT_YMIR //alias <alias_name>
 
 
   use action changeStatus;
-  use association _History { create; with draft; }
+
+// AGREGA ESTO:
+  side effects {
+    action changeStatus affects entity _History;
+  }
+
+  use association _History { create; with draft;  }
 }
 
-define behavior for ZDD_C_INCT_H_YMIR //alias <alias_name>
+define behavior for ZDD_C_INCT_H_YMIR alias History
 {
   use update;
   use delete;

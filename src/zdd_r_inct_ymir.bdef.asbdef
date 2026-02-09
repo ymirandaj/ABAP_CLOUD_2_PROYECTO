@@ -34,8 +34,8 @@
 
 
 
-  // 1. Declarar la validación indicando qué campos la disparan
-    validation validateFields on save { create; update; field Title, Description, Priority; }
+      // 1. Declarar la validación indicando qué campos la disparan
+      validation validateFields on save { create; update; field Title, Description, Priority; }
 
 
 
@@ -54,7 +54,10 @@
       association _History { create; with draft; }
 
 
-
+      side effects
+      {
+        action changeStatus affects entity _History;
+      }
       action ( features : instance, authorization : update ) changeStatus
         parameter ZDD_AE_CHANGE_STATUS_YMIR
         result [1] $self;
@@ -62,7 +65,7 @@
 
 
       determination setInitialValues on modify { create; }
-      determination createInitialHistory on save { create;  }
+      determination createInitialHistory on save { create; }
 
 
 
@@ -74,7 +77,8 @@
 
       draft action Resume;
 
-      draft determine action Prepare {
+      draft determine action Prepare
+      {
         validation validateFields;
       }
 
@@ -108,8 +112,8 @@
     {
       update;
 
-     delete;
-     mapping for zdt_inct_h_ymir
+      delete;
+      mapping for zdt_inct_h_ymir
         {
           HisUUID            = his_uuid;
           IncUUID            = inc_uuid;
@@ -128,7 +132,7 @@
 
       // Asociación para regresar al padre
 
-      association _Incident {  with draft; }
+      association _Incident { with draft; }
 
 
 
