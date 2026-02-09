@@ -1,0 +1,7 @@
+@EndUserText.label: 'Services definicion de los incidentes'
+define service ZSD_INCT_YMIR {
+  expose ZDD_C_INCT_YMIR      as Incident;
+  expose ZDD_C_INCT_H_YMIR    as History;
+  expose ZDD_PRIORITY_VH_YMIR as PriorityVH;
+  expose ZDD_STATUS_VH_YMIR   as StatusVH;
+}

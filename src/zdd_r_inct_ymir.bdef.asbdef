@@ -1,128 +1,140 @@
-managed implementation in class zbp_dd_r_inct_ymir unique;
-strict ( 2 );
-with draft;
-define behavior for ZDD_R_INCT_YMIR alias Incident
-persistent table zdt_inct_ymir
-draft table zdtinct_ymir_d
-etag master LocalLastChangedAt
-lock master total etag LastChangedAt
-authorization master ( global, instance )
-{
-
-  association _History { create; with draft; }
-  field ( readonly )
-
-  IncUUID,
-
-  LocalCreatedBy,
-
-  LocalCreatedAt,
-
-  LocalLastChangedBy,
-
-  LocalLastChangedAt,
-
-  LastChangedAt;
+    managed implementation in class zbp_dd_r_inct_ymir unique;
+    strict ( 2 );
+    with draft;
+    define behavior for ZDD_R_INCT_YMIR alias Incident
 
 
-
-  field ( numbering : managed )
-
-  IncUUID;
-
-  field ( mandatory ) Title, Description, Priority;
-  field ( readonly ) IncidentId,  CreationDate, ChangedDate, Status;
+    persistent table zdt_inct_ymir
+    draft table zdtinct_ymir_d
 
 
-  create;
-
-  update;
-
-  delete;
-
-  //field (features : instance) Status;
-
-  action(features : instance, authorization : update) changeStatus
-    parameter ZDD_AE_CHANGE_STATUS_YMIR result[1] $self;
+    etag master LocalLastChangedAt
+    lock master total etag LastChangedAt
+    authorization master ( global, instance )
 
 
-
-  determination setInitialValues on modify { create; }
-  determination createInitialHistory on save { create; }
-
-  draft action Activate optimized;
-
-  draft action Discard;
-
-  draft action Edit;
-
-  draft action Resume;
-
-  draft determine action Prepare;
-
-
-
-  mapping for zdt_inct_ymir corresponding
     {
-      IncUUID            = inc_uuid;
-      IncidentID         = incident_id;
-      Title              = title;
-      Description        = description;
-      Status             = status;
-      Priority           = priority;
-      CreationDate       = creation_date;
-      ChangedDate        = changed_date;
-      LocalCreatedBy     = local_created_by;
-      LocalCreatedAt     = local_created_at;
-      LocalLastChangedBy = local_last_changed_by;
-      LocalLastChangedAt = local_last_changed_at;
-      LastChangedAt      = last_changed_at;
+      field ( numbering : managed, readonly ) IncUUID;
+
+
+
+      field ( readonly )
+
+
+
+      LocalCreatedBy,
+
+      LocalCreatedAt,
+
+      LocalLastChangedBy,
+
+      LocalLastChangedAt,
+
+      LastChangedAt;
+
+
+
+  // 1. Declarar la validación indicando qué campos la disparan
+    validation validateFields on save { create; update; field Title, Description, Priority; }
+
+
+
+      field ( mandatory ) Title, Description, Priority;
+      field ( readonly ) IncidentId, Status;
+
+      field ( features : instance ) CreationDate, ChangedDate;
+
+      create;
+
+      update;
+
+      delete;
+
+
+      association _History { create; with draft; }
+
+
+
+      action ( features : instance, authorization : update ) changeStatus
+        parameter ZDD_AE_CHANGE_STATUS_YMIR
+        result [1] $self;
+
+
+
+      determination setInitialValues on modify { create; }
+      determination createInitialHistory on save { create;  }
+
+
+
+      draft action Activate optimized;
+
+      draft action Discard;
+
+      draft action Edit;
+
+      draft action Resume;
+
+      draft determine action Prepare {
+        validation validateFields;
+      }
+
+
+
+      mapping for zdt_inct_ymir corresponding
+        {
+          IncUUID            = inc_uuid;
+          IncidentID         = incident_id;
+          Title              = title;
+          Description        = description;
+          Status             = status;
+          Priority           = priority;
+          CreationDate       = creation_date;
+          ChangedDate        = changed_date;
+          LocalCreatedBy     = local_created_by;
+          LocalCreatedAt     = local_created_at;
+          LocalLastChangedBy = local_last_changed_by;
+          LocalLastChangedAt = local_last_changed_at;
+          LastChangedAt      = last_changed_at;
+        }
+
     }
 
-}
-
-define behavior for ZDD_INCT_H_YMIR alias History
-persistent table zdt_inct_h_ymir
-draft table zdtinct_h_ymir_d
-lock dependent by _Incident
-authorization dependent by _Incident
-etag master LocalLastChangedAt
-{
-  update;
-
-  delete;
-
-
-
-
-  // Mapeo de campos entre la Vista CDS y la Tabla de Base de Datos
-
-  mapping for zdt_inct_h_ymir
+    define behavior for ZDD_INCT_H_YMIR alias History
+    persistent table zdt_inct_h_ymir
+    draft table zdtinct_h_ymir_d
+    lock dependent by _Incident
+    authorization dependent by _Incident
+    etag master LocalLastChangedAt
     {
-      HisUUID            = his_uuid;
-      IncUUID            = inc_uuid;
-      HisID              = his_id;
-      PreviousStatus     = previous_status;
-      NewStatus          = new_status;
-      Text               = text;
-      LocalCreatedBy     = local_created_by;
-      LocalCreatedAt     = local_created_at;
-      LocalLastChangedBy = local_last_changed_by;
-      LocalLastChangedAt = local_last_changed_at;
-      LastChangedAt      = last_changed_at;
+      update;
+
+     delete;
+     mapping for zdt_inct_h_ymir
+        {
+          HisUUID            = his_uuid;
+          IncUUID            = inc_uuid;
+          HisID              = his_id;
+          PreviousStatus     = previous_status;
+          NewStatus          = new_status;
+          Text               = text;
+          LocalCreatedBy     = local_created_by;
+          LocalCreatedAt     = local_created_at;
+          LocalLastChangedBy = local_last_changed_by;
+          LocalLastChangedAt = local_last_changed_at;
+          LastChangedAt      = last_changed_at;
+        }
+
+
+
+      // Asociación para regresar al padre
+
+      association _Incident {  with draft; }
+
+
+
+      // Determinar automáticamente el UUID de la clave si no lo envía el UI
+
+      field ( readonly, numbering : managed ) HisUUID;
+      field ( readonly ) IncUUID, HisId, NewStatus, PreviousStatus, Text;
+
     }
-
-
-
-  // Asociación para regresar al padre
-
-  association _Incident { with draft; }
-
-
-
-  // Determinar automáticamente el UUID de la clave si no lo envía el UI
-
-  field ( readonly, numbering : managed ) HisUUID;
-  field ( readonly ) IncUUID, HisId, NewStatus, PreviousStatus, Text;
-
-}

@@ -6,6 +6,7 @@ define root view entity ZDD_C_INCT_YMIR
 provider contract transactional_query 
 as projection on ZDD_R_INCT_YMIR
 {
+    
     key IncUuid,
     IncidentId,
     Title,
@@ -27,6 +28,7 @@ as projection on ZDD_R_INCT_YMIR
     LocalLastChangedAt,
     LastChangedAt,
     /* Associations */
+
     _History:redirected to composition child ZDD_C_INCT_H_YMIR,
     _Priority,
     _Status

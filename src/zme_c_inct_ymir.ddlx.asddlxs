@@ -11,19 +11,21 @@ annotate entity ZDD_C_INCT_YMIR
     with 
 {
   @EndUserText.label: 'IncUUID'
+  
   @UI.facet: [{ id:            'Incident',
                 purpose:       #STANDARD,
                 type:          #IDENTIFICATION_REFERENCE,
                 label:         'Incident',
                 position:      10 },
-              { id:            'History',
-                purpose:       #STANDARD,
-                type:          #LINEITEM_REFERENCE,
-                label:         'History',
-                position:      20,
-                targetElement: '_History'}]
+               {
+    id: 'History',
+    type: #LINEITEM_REFERENCE,
+    label: 'History',
+    position: 20,
+    targetElement: '_History'
+  }]
   @UI.hidden: true
-  @UI: {lineItem: [{ position: 10,
+  @UI: { lineItem: [{ position: 10,
                importance: #HIGH,
                label: 'IncUUID'},
                { type: #FOR_ACTION,
@@ -33,10 +35,13 @@ annotate entity ZDD_C_INCT_YMIR
   identification: [{ position: 10,
                      label: 'IncUUID' },
                { type: #FOR_ACTION,
+                 navigationAvailable: true,
                  dataAction: 'changeStatus',
                  label: 'Change Status',
                  position: 10 } ],
+  
   selectionField: [{ position: 10 }]}
+ 
   IncUuid;
 
   @UI: {lineItem: [{ position: 20,
@@ -99,41 +104,23 @@ annotate entity ZDD_C_INCT_YMIR
   selectionField: [{ position: 80 }]}
   ChangedDate;
 
-  @UI: {lineItem: [{ position: 90,
-               importance: #LOW }],
-  identification: [{ position: 90  } ],
-  selectionField: [{ position: 90 }]}
   @UI.hidden: true
   LocalCreatedBy;
 
-  @UI: {lineItem: [{ position: 100,
-               importance: #LOW }],
-  identification: [{ position: 100  } ],
-  selectionField: [{ position: 100 }]}
+
   @UI.hidden: true
   LocalCreatedAt;
 
-  @UI: {lineItem: [{ position: 100,
-               importance: #LOW }],
-  identification: [{ position: 110  } ],
-  selectionField: [{ position: 110 }]}
+
   @UI.hidden: true
   LocalLastChangedBy;
 
-  @UI: {lineItem: [{ position: 120,
-               importance: #LOW }],
-  identification: [{ position: 120  } ],
-  selectionField: [{ position: 120 }]}
+
   @UI.hidden: true
   LocalLastChangedAt;
 
-  @UI: {lineItem: [{ position: 130,
-               importance: #LOW }],
-  identification: [{ position: 130  } ],
-  selectionField: [{ position: 130 }]}
   @UI.hidden: true
   LastChangedAt;
  
-   @UI.hidden: true 
-  _History;
+
 }
