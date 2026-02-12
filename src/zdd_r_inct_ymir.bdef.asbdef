@@ -39,7 +39,7 @@
 
 
 
-      field ( mandatory ) Title, Description, Priority;
+      field ( mandatory   ) Title, Description, Priority;
       field ( readonly ) IncidentId, Status;
 
       field ( features : instance ) CreationDate, ChangedDate;

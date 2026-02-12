@@ -21,8 +21,9 @@ CLASS zcl_insert_data_ymir IMPLEMENTATION.
     "insert_statuses( out ).
     "insert_priorities( out ).
 
-    delete from  zdtinct_h_ymir_d.
-    delete from  zdtinct_ymir_d.
+    "delete from  zdtinct_h_ymir_d.
+    "delete from  zdtinct_ymir_d.
+
 
 
   ENDMETHOD.

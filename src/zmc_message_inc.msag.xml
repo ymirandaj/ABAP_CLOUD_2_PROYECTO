@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>Mensajes para los ingresos de los incidentes</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>El campo &amp;1 es obligatorio</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>El título debe tener al menos &amp;1 caracteres</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>La descripción debe tener al menos &amp;1 caracteres</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>La prioridad debe ser Alta, Media o Baja</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>El título no puede contener caracteres especiales</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>La descripción es demasiado larga (máximo &amp;1 caracteres)</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>Se recomienda proporcionar más detalles en la descripción</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>Incidente &amp;1 validado correctamente</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>Validando campos del incidente &amp;1</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>010</MSGNR>
+     <TEXT>El estado &amp;1 no es válido para la transición</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>011</MSGNR>
+     <TEXT>Debe ingresar un título</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>012</MSGNR>
+     <TEXT>Debe ingresar una descripción</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>013</MSGNR>
+     <TEXT>Debe ingresar una prioridad</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>El formato de la fecha de creación no es válido</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>015</MSGNR>
+     <TEXT>El formato de la fecha de cambio no es válido</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>016</MSGNR>
+     <TEXT>No está autorizado para modificar este incidente</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>017</MSGNR>
+     <TEXT>El incidente &amp;1 no existe</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>018</MSGNR>
+     <TEXT>La observación es obliogatoria.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>019</MSGNR>
+     <TEXT>El estado nuevo no puede ser igual al estado anterior</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>020</MSGNR>
+     <TEXT>Transición de estado no permitida de &amp;1 a &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>021</MSGNR>
+     <TEXT>La fecha de creación no debe estar vacía.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>022</MSGNR>
+     <TEXT>La fecha de creación &amp;1 no debe ser mayor a la fecha actual $2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>023</MSGNR>
+     <TEXT>El estado no se puede cambiar a completado o cerrado si aun está pendient</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

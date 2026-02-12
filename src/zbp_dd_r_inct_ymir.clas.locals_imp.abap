@@ -200,130 +200,238 @@ CLASS lhc_Indicent IMPLEMENTATION.
     ).
   ENDMETHOD.
 
-*
+
+
 *  METHOD changeStatus.
-*
-*
-*
-*
+*    " 1. Leer los incidentes actuales
 *    READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-*    ENTITY Incident
-*    FIELDS ( Status )
-*    WITH CORRESPONDING #( keys )
-*    RESULT DATA(incidents).
-*
-*
-*
+*      ENTITY Incident
+*      FIELDS ( Status IncUUID ) " IncUUID es necesario para tu método get_next_history_id
+*      WITH CORRESPONDING #( keys )
+*      RESULT DATA(incidents).
 *
 *    LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
-*
-*      "PARAMETROS DE STATUS
-*
+*      " Obtener parámetros de la acción para esta clave específica
 *      DATA(ls_status_param) = keys[ KEY id %tky = <incident>-%tky ]-%param.
 *
+*      " 2. Actualizar estatus y Crear Historial en una sola llamada MODIFY (Más eficiente)
 *      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-*       ENTITY Incident
-*         UPDATE FIELDS ( Status )
-*         WITH VALUE #( ( %tky   = <incident>-%tky
-*                         Status = ls_status_param-status ) ).
-*
-*
-*
-*
-*      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-*            ENTITY Incident
-*              CREATE BY \_History
-*              FIELDS ( PreviousStatus NewStatus Text HisId )
-*              WITH VALUE #( ( %tky    = <incident>-%tky
-*                              %target = VALUE #( (
-*                                                   %cid           = 'NEW_HIST_ENTRY'
-*                                                   HisId    = get_next_history_id( <incident>-IncUUID )
-*                                                   PreviousStatus = <incident>-Status
-*                                                   NewStatus      = ls_status_param-status
-*                                                   Text           = ls_status_param-text ) ) ) )
-*
-*      MAPPED DATA(lt_mapped_local)
+*        ENTITY Incident
+*          UPDATE FIELDS ( Status )
+*          WITH VALUE #( ( %tky = <incident>-%tky Status = ls_status_param-status ) )
+*        ENTITY Incident
+*          CREATE BY \_History
+*          FIELDS ( PreviousStatus NewStatus Text HisId )
+*          WITH VALUE #( ( %tky    = <incident>-%tky
+*                          %target = VALUE #( (
+*                                    " CID único usando el índice del loop para evitar errores
+*                                    %cid           = |HIST_{ sy-tabix }|
+*                                    HisId          = get_next_history_id( <incident>-IncUUID )
+*                                    PreviousStatus = <incident>-Status
+*                                    NewStatus      = ls_status_param-status
+*                                    Text           = ls_status_param-text ) ) ) )
+*        MAPPED DATA(lt_mapped_local)
 *        FAILED DATA(lt_failed_local)
 *        REPORTED DATA(lt_reported_local).
 *
+*      " 3. Mapear errores y respuestas
+*      " Importante: recolectar de ambas entidades (Incident y History)
+*      INSERT LINES OF lt_failed_local-incident   INTO TABLE failed-incident.
+*      INSERT LINES OF lt_failed_local-history    INTO TABLE failed-history.
+*      INSERT LINES OF lt_reported_local-incident INTO TABLE reported-incident.
+*      INSERT LINES OF lt_reported_local-history  INTO TABLE reported-history.
 *
-*
-*
-*      APPEND LINES OF lt_failed_local-incident TO failed-incident.
-*      APPEND LINES OF lt_reported_local-incident TO reported-incident.
-*   mapped-history = VALUE #( FOR <line> IN lt_mapped_local-history (
-*    %tky = <line>-%tky
-*) ).
-*
-*      APPEND LINES OF lt_reported_local-history TO reported-history.
-*
+*      " Mapear el historial creado para el framework
+*      INSERT LINES OF lt_mapped_local-history    INTO TABLE mapped-history.
 *    ENDLOOP.
 *
-*    READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-*         ENTITY Incident
-*           ALL FIELDS WITH CORRESPONDING #( keys )
-*         RESULT DATA(updated_incidents).
+*    " 4. Leer los datos actualizados para devolver el resultado a la UI
+*    IF failed-incident IS INITIAL.
+*      READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+*        ENTITY Incident
+*        ALL FIELDS WITH CORRESPONDING #( keys )
+*        RESULT DATA(updated_incidents).
 *
-*    result = VALUE #( FOR inc IN updated_incidents
+*      result = VALUE #( FOR inc IN updated_incidents
 *                       ( %tky = inc-%tky %param = inc ) ).
-*
-*
+*    ENDIF.
 *  ENDMETHOD.
 
-METHOD changeStatus.
-  " 1. Leer los incidentes actuales
-  READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-    ENTITY Incident
-    FIELDS ( Status IncUUID ) " IncUUID es necesario para tu método get_next_history_id
-    WITH CORRESPONDING #( keys )
-    RESULT DATA(incidents).
-
-  LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
-    " Obtener parámetros de la acción para esta clave específica
-    DATA(ls_status_param) = keys[ KEY id %tky = <incident>-%tky ]-%param.
-
-    " 2. Actualizar estatus y Crear Historial en una sola llamada MODIFY (Más eficiente)
-    MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
-      ENTITY Incident
-        UPDATE FIELDS ( Status )
-        WITH VALUE #( ( %tky = <incident>-%tky Status = ls_status_param-status ) )
-      ENTITY Incident
-        CREATE BY \_History
-        FIELDS ( PreviousStatus NewStatus Text HisId )
-        WITH VALUE #( ( %tky    = <incident>-%tky
-                        %target = VALUE #( (
-                                  " CID único usando el índice del loop para evitar errores
-                                  %cid           = |HIST_{ sy-tabix }|
-                                  HisId          = get_next_history_id( <incident>-IncUUID )
-                                  PreviousStatus = <incident>-Status
-                                  NewStatus      = ls_status_param-status
-                                  Text           = ls_status_param-text ) ) ) )
-      MAPPED DATA(lt_mapped_local)
-      FAILED DATA(lt_failed_local)
-      REPORTED DATA(lt_reported_local).
-
-    " 3. Mapear errores y respuestas
-    " Importante: recolectar de ambas entidades (Incident y History)
-    INSERT LINES OF lt_failed_local-incident   INTO TABLE failed-incident.
-    INSERT LINES OF lt_failed_local-history    INTO TABLE failed-history.
-    INSERT LINES OF lt_reported_local-incident INTO TABLE reported-incident.
-    INSERT LINES OF lt_reported_local-history  INTO TABLE reported-history.
-
-    " Mapear el historial creado para el framework
-    INSERT LINES OF lt_mapped_local-history    INTO TABLE mapped-history.
-  ENDLOOP.
-
-  " 4. Leer los datos actualizados para devolver el resultado a la UI
-  IF failed-incident IS INITIAL.
+  METHOD changeStatus.
+    " 1. Leer los datos actuales (Incluimos campos necesarios para validar)
     READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
       ENTITY Incident
-      ALL FIELDS WITH CORRESPONDING #( keys )
-      RESULT DATA(updated_incidents).
+      FIELDS ( Status IncUUID )
+      WITH CORRESPONDING #( keys )
+      RESULT DATA(incidents).
 
-    result = VALUE #( FOR inc IN updated_incidents
-                     ( %tky = inc-%tky %param = inc ) ).
-  ENDIF.
-ENDMETHOD.
+    LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
+      " Limpiar mensajes previos de esta acción
+      APPEND VALUE #( %tky = <incident>-%tky %state_area = 'VALIDATE_INCIDENT' ) TO reported-incident.
+
+      " Obtener parámetros de la acción
+      DATA(ls_status_param) = keys[ KEY id %tky = <incident>-%tky ]-%param.
+
+      " ==========================================================
+      " BLOQUE DE VALIDACIONES
+      " ==========================================================
+      DATA(lv_has_error) = abap_false.
+
+      if <incident>-Status = 'PE' AND ( ls_status_param-status = 'CO' OR ls_status_param-status = 'CL'  ).
+
+      lv_has_error = abap_true.
+        APPEND VALUE #( %tky = <incident>-%tky ) TO failed-incident.
+        APPEND VALUE #(
+          %tky          = <incident>-%tky
+          %state_area   = 'VALIDATE_INCIDENT'
+          %msg          = NEW zcx_inct_messages_ymir(
+                            textid      = zcx_inct_messages_ymir=>state_pending_validate " Debes crear esta constante
+                            severity    = if_abap_behv_message=>severity-error
+                            inc_uuid    = <incident>-IncUUID
+                            incident_id = CONV #( <incident>-IncidentId ) )
+        ) TO reported-incident.
+      ENDIF.
+      IF lv_has_error = abap_true.
+        CONTINUE.
+      ENDIF.
+
+
+
+      IF <incident>-Status = 'CL' OR <incident>-Status = 'CN' OR <incident>-Status = 'CO'.
+        lv_has_error = abap_true.
+        APPEND VALUE #( %tky = <incident>-%tky ) TO failed-incident.
+        APPEND VALUE #(
+          %tky          = <incident>-%tky
+          %state_area   = 'VALIDATE_INCIDENT'
+          %msg          = NEW zcx_inct_messages_ymir(
+                            textid      = zcx_inct_messages_ymir=>invalid_status_transition " Debes crear esta constante
+                            severity    = if_abap_behv_message=>severity-error
+                            inc_uuid    = <incident>-IncUUID
+                            incident_id = CONV #( <incident>-IncidentId ) )
+        ) TO reported-incident.
+      ENDIF.
+      IF lv_has_error = abap_true.
+        CONTINUE.
+      ENDIF.
+
+      " Validación 2: El texto de justificación es obligatorio
+      IF ls_status_param-status IS INITIAL.
+        lv_has_error = abap_true.
+        APPEND VALUE #( %tky = <incident>-%tky  ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky                   = <incident>-%tky
+          %state_area            = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg                   = NEW zcx_inct_messages_ymir(
+          previous_status = |{ <incident>-Status }|
+          new_status = |{ ls_status_param-status  }|
+            textid       = zcx_inct_messages_ymir=>field_required
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = <incident>-IncUUID
+            incident_id  = CONV #( <incident>-IncidentId
+
+             )
+
+          )
+
+        ) TO reported-incident.
+
+      ELSEIF <incident>-Status = ls_status_param-status.
+        lv_has_error = abap_true.
+        APPEND VALUE #( %tky = <incident>-%tky  ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky                   = <incident>-%tky
+          %state_area            = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg                   = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>same_status
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = <incident>-IncUUID
+            incident_id  = CONV #( <incident>-IncidentId )
+
+          )
+
+        ) TO reported-incident.
+
+
+
+
+      ENDIF.
+
+
+      IF lv_has_error = abap_true.
+        CONTINUE.
+      ENDIF.
+
+      " Validación 1: El nuevo estatus no puede ser igual al actual
+
+
+      " Validación 2: El texto de justificación es obligatorio
+      IF ls_status_param-text IS INITIAL.
+        lv_has_error = abap_true.
+        APPEND VALUE #( %tky = <incident>-%tky  ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky                   = <incident>-%tky
+          %state_area            = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg                   = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>history_text_required
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = <incident>-IncUUID
+            incident_id  = CONV #( <incident>-IncidentId )
+
+          )
+
+        ) TO reported-incident.
+      ENDIF.
+
+      " Si hay errores, saltamos al siguiente incidente sin ejecutar el MODIFY
+      IF lv_has_error = abap_true.
+        CONTINUE.
+      ENDIF.
+
+
+
+
+      " ==========================================================
+      " PROCESO DE ACTUALIZACIÓN (Solo si no hay errores)
+      " ==========================================================
+      MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+        ENTITY Incident
+          UPDATE FIELDS ( Status )
+          WITH VALUE #( ( %tky = <incident>-%tky Status = ls_status_param-status ) )
+        ENTITY Incident
+          CREATE BY \_History
+          FIELDS ( PreviousStatus NewStatus Text HisId )
+          WITH VALUE #( ( %tky    = <incident>-%tky
+                          %target = VALUE #( (
+                                    %cid           = |HIST_{ sy-tabix }|
+                                    HisId          = get_next_history_id( <incident>-IncUUID )
+                                    PreviousStatus = <incident>-Status
+                                    NewStatus      = ls_status_param-status
+                                    Text           = ls_status_param-text ) ) ) )
+        MAPPED DATA(lt_mapped_local)
+        FAILED DATA(lt_failed_local)
+        REPORTED DATA(lt_reported_local).
+
+      " Recolectar resultados del MODIFY
+      INSERT LINES OF lt_failed_local-incident   INTO TABLE failed-incident.
+      INSERT LINES OF lt_reported_local-incident INTO TABLE reported-incident.
+      INSERT LINES OF lt_mapped_local-history    INTO TABLE mapped-history.
+    ENDLOOP.
+
+    " 4. Devolver el resultado a la UI
+    IF failed-incident IS INITIAL.
+      READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+        ENTITY Incident
+        ALL FIELDS WITH CORRESPONDING #( keys )
+        RESULT DATA(updated_incidents).
+
+      result = VALUE #( FOR inc IN updated_incidents
+                       ( %tky = inc-%tky %param = inc ) ).
+    ENDIF.
+  ENDMETHOD.
+
 
 
   METHOD get_next_incident_id.
@@ -342,66 +450,189 @@ ENDMETHOD.
 
 
   METHOD validateFields.
-   " 1. Leer los datos actuales
-  READ ENTITIES OF ZDD_R_INCT_YMIR IN LOCAL MODE
-    ENTITY Incident
-    FIELDS ( Title Description Priority )
-    WITH CORRESPONDING #( keys )
-    RESULT DATA(lt_incidents).
+    " Leer los datos actuales
+    READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
+      ENTITY Incident
+      FIELDS ( Title Description Priority CreationDate )
+      WITH CORRESPONDING #( keys )
+      RESULT DATA(lt_incidents).
 
-  LOOP AT lt_incidents INTO DATA(ls_incident).
-    " Limpiar mensajes previos para este registro
+    CLEAR: failed-incident, reported-incident.
 
 
-    " Validación de Title
-    IF ls_incident-Title IS INITIAL.
+    LOOP AT lt_incidents INTO DATA(ls_incident).
 
-     APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+      " 1. PASO CRUCIAL: Limpiar el área de estado SIEMPRE para este registro
+      APPEND VALUE #(
+          %tky        = ls_incident-%tky
+          %state_area = 'VALIDATE_INCIDENT'
+      ) TO reported-incident.
 
-    ELSE.
-        " Validación de longitud del título (Ejemplo: mínimo 5 caracteres)
-      IF strlen( ls_incident-Title ) < 5.
+      " ====================================================================
+      " Validación de Title
+      " ====================================================================
+      IF ls_incident-Title IS INITIAL.
+        " Agregar a failed
         APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+
+        " Agregar mensaje específico a reported con %state_area
+        APPEND VALUE #(
+          %tky               = ls_incident-%tky
+          %state_area        = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg               = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>enter_title
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = ls_incident-IncUUID
+            incident_id  = CONV #( ls_incident-IncidentId )
+          )
+          %element-title     = if_abap_behv=>mk-on
+        ) TO reported-incident.
+
+      ELSEIF strlen( ls_incident-Title ) < 5.
+        " Título muy corto
+        APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky               = ls_incident-%tky
+          %state_area        = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg               = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>title_too_short
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = ls_incident-IncUUID
+            incident_id  = CONV #( ls_incident-IncidentId )
+            min_length   = '5'
+          )
+          %element-title     = if_abap_behv=>mk-on
+        ) TO reported-incident.
       ENDIF.
-*      APPEND VALUE #( %tky = ls_incident-%tky
-*                      %msg = NEW zcm_incidents( " Asumiendo que tienes una clase de mensajes
-*                                 textid   = zcm_incidents=>field_empty
-*                                 severity = if_abap_behv=>ms-error )
-*
-*
-*                      %element-title = if_abap_behv=>mk-on ) TO reported-incident.
-    ENDIF.
 
-       IF ls_incident-Description IS INITIAL.
-      APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
-      else.
-       IF strlen( ls_incident-Description ) < 5.
+      " ====================================================================
+      " Validación de Description
+      " ====================================================================
+      IF ls_incident-Description IS INITIAL.
         APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky                   = ls_incident-%tky
+          %state_area            = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg                   = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>enter_description
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = ls_incident-IncUUID
+            incident_id  = CONV #( ls_incident-IncidentId )
+          )
+          %element-description   = if_abap_behv=>mk-on
+        ) TO reported-incident.
+
+      ELSEIF strlen( ls_incident-Description ) < 5.
+        " Descripción muy corta
+        APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky                   = ls_incident-%tky
+          %state_area            = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg                   = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>description_too_short
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = ls_incident-IncUUID
+            incident_id  = CONV #( ls_incident-IncidentId )
+            min_length   = '5'
+          )
+          %element-description   = if_abap_behv=>mk-on
+        ) TO reported-incident.
+      ENDIF.
+      DATA(lv_today) = cl_abap_context_info=>get_system_date( ).
+
+      " 1. Obtener el timestamp actual del sistema (UTC)
+      GET TIME STAMP FIELD DATA(lv_timestamp).
+
+      " 2. Convertirlo a tu zona horaria específica
+      CONVERT TIME STAMP lv_timestamp
+              TIME ZONE 'EST'  " O 'America/Guayaquil'
+              INTO DATE DATA(lv_local_date).
+
+
+      IF ls_incident-CreationDate IS INITIAL.
+        APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky                   = ls_incident-%tky
+          %state_area            = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg                   = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>enter_creation_date
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = ls_incident-IncUUID
+            incident_id  = CONV #( ls_incident-IncidentId )
+          )
+          %element-creationDate   = if_abap_behv=>mk-on
+        ) TO reported-incident.
+
+      ELSEIF ls_incident-CreationDate > lv_local_date.
+        " Descripción muy corta
+        APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky                   = ls_incident-%tky
+          %state_area            = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg                   = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>creation_date_invalid
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = ls_incident-IncUUID
+            incident_id  = CONV #( ls_incident-IncidentId )
+            creation_date = ls_incident-CreationDate
+            changed_date = lv_local_date
+          )
+          %element-creationDate   = if_abap_behv=>mk-on
+        ) TO reported-incident.
+      ENDIF.
+
+      " ====================================================================
+      " Validación de Priority
+      " ====================================================================
+      IF ls_incident-Priority IS INITIAL.
+        APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+
+        APPEND VALUE #(
+          %tky                 = ls_incident-%tky
+          %state_area          = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+          %msg                 = NEW zcx_inct_messages_ymir(
+            textid       = zcx_inct_messages_ymir=>enter_priority
+            severity     = if_abap_behv_message=>severity-error
+            inc_uuid     = ls_incident-IncUUID
+            incident_id  = CONV #( ls_incident-IncidentId )
+          )
+          %element-priority    = if_abap_behv=>mk-on
+        ) TO reported-incident.
+
+      ELSE.
+        " Validar que el código de prioridad exista
+        SELECT SINGLE FROM zdd_priority_vh_ymir
+          FIELDS PriorityCode
+          WHERE PriorityCode = @ls_incident-Priority
+          INTO @DATA(lv_priority_exists).
+
+        IF sy-subrc <> 0.
+          " Priority no válida
+          APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
+
+          APPEND VALUE #(
+            %tky                 = ls_incident-%tky
+            %state_area          = 'VALIDATE_INCIDENT'   " <-- AGREGADO
+            %msg                 = NEW zcx_inct_messages_ymir(
+              textid       = zcx_inct_messages_ymir=>invalid_priority
+              severity     = if_abap_behv_message=>severity-error
+              inc_uuid     = ls_incident-IncUUID
+              incident_id  = CONV #( ls_incident-IncidentId )
+            )
+            %element-priority    = if_abap_behv=>mk-on
+          ) TO reported-incident.
         ENDIF.
-*      APPEND VALUE #( %tky = ls_incident-%tky
-*                      %msg = NEW zcm_incidents( " Asumiendo que tienes una clase de mensajes
-*                                 textid   = zcm_incidents=>field_empty
-*                                 severity = if_abap_behv=>ms-error )
-*
-*
-*                      %element-title = if_abap_behv=>mk-on ) TO reported-incident.
-    ENDIF.
+      ENDIF.
 
-    " Validación de Priority (Ejemplo: Solo valores A, B, C)
-    IF ls_incident-Priority IS INITIAL.
-     APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
-    else.
-       IF strlen( ls_incident-Priority ) <> 1.
-        APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
-       ENDIF.
-*      APPEND VALUE #( %tky = ls_incident-%tky
-*                      %msg = NEW_MESSAGE_WITH_TEXT(
-*                                 severity = if_abap_behv=>ms-error
-*                                 text     = 'La prioridad es obligatoria' )
-*                      %element-priority = if_abap_behv=>mk-on ) TO reported-incident.
-    ENDIF.
-  ENDLOOP.
+    ENDLOOP.
 
   ENDMETHOD.
+
+
 
 ENDCLASS.

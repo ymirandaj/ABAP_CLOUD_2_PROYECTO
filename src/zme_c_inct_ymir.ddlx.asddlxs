@@ -16,6 +16,7 @@ annotate entity ZDD_C_INCT_YMIR
                 purpose:       #STANDARD,
                 type:          #IDENTIFICATION_REFERENCE,
                 label:         'Incident',
+                
                 position:      10 },
                {
     id: 'History',
