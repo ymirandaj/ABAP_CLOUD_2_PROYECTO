@@ -8,7 +8,10 @@ CLASS zcl_insert_data_ymir DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
 
-    METHODS: insert_statuses IMPORTING io_out TYPE REF TO if_oo_adt_classrun_out,
+    METHODS:
+    "SE CREA EL MÉTODO INSERT STATUSES PARA INGRESAR LOS DATOS DE ESTADOS EN LA TABLA ZDT_STATUS_YMIR
+    insert_statuses IMPORTING io_out TYPE REF TO if_oo_adt_classrun_out,
+    "SE CREA EL MÉTOFO INSERT PRIORITIES PARA INGRESAR LOS DATOS DE PRIORIDADES EN LA TABLA ZDT_PRIORITY_YM
       insert_priorities IMPORTING io_out TYPE REF TO if_oo_adt_classrun_out .
 
 ENDCLASS.
@@ -20,16 +23,13 @@ CLASS ZCL_INSERT_DATA_YMIR IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
 
-    "insert_statuses( out ).
-    "insert_priorities( out ).
-
-    "delete from  zdtinct_h_ymir_d.
-    "delete from  zdtinct_ymir_d.
+    "SE EJECUTAN LOS MÉTODOS DE INSERCIÓN DE ESTADOS Y PRIORIDADES
+    insert_statuses( out ).
+    insert_priorities( out ).
 
 
 
   ENDMETHOD.
-
 
   METHOD insert_priorities.
 
@@ -64,6 +64,8 @@ CLASS ZCL_INSERT_DATA_YMIR IMPLEMENTATION.
 
 
     TRY.
+
+
         lt_status = VALUE #(
                        ( status_code = 'OP' status_description = 'Open' )
                        ( status_code = 'IP' status_description = 'In Progress' )

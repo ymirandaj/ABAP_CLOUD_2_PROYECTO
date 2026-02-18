@@ -1,3 +1,7 @@
+"! <p class="shorttext synchronized" lang="es">Esta clase sirve para los mensajes de los incidentes</p>
+"! <p class="longtext synchronized" lang="es">Esta clase se utiliza para manejar los mensajes de error y validaciones relacionados con los incidentes en el sistema.
+"! Contiene constantes para diferentes tipos de mensajes, como campos requeridos, longitud mínima y máxima, prioridades inválidas, entre otros. Además, tiene un constructor
+"! que permite inicializar los atributos del mensaje y establecer la severidad del mismo.</p>
 CLASS zcx_inct_messages_ymir DEFINITION
   PUBLIC
   INHERITING FROM cx_static_check

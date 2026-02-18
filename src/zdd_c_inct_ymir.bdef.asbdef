@@ -17,14 +17,16 @@ define behavior for ZDD_C_INCT_YMIR alias Incident
 
   use action changeStatus;
 
-// AGREGA ESTO:
+//EFECTO PARA EL CAMBIO DE STATUS, PARA QUE SE PUEDA REFRESCAR LA HISTORIA EN EL FIORI
   side effects {
     action changeStatus affects entity _History;
   }
-
+//ASOCIACIÓN CON EL HISTORIAL
   use association _History { create; with draft;  }
 }
 
+
+// Comportamiento para el historial
 define behavior for ZDD_C_INCT_H_YMIR alias History
 {
   use update;

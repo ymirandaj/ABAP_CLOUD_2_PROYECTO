@@ -2,34 +2,45 @@
 
 CLASS lhc_Indicent DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
+
+    "AUTORIZACIONES POR INSTANCIA
     METHODS get_instance_authorizations FOR INSTANCE AUTHORIZATION
       IMPORTING keys REQUEST requested_authorizations FOR Incident RESULT result.
 
+    "AUTORIZACIONES GLOBALES
     METHODS get_global_authorizations FOR GLOBAL AUTHORIZATION
       IMPORTING REQUEST requested_authorizations FOR Incident RESULT result.
+
+    "MÉTODO PARA DAR LOS VALORES INICIALES AL MOMENTO DE CREAR UN INCIDENTE
     METHODS setInitialValues FOR DETERMINE ON MODIFY
       IMPORTING keys FOR Incident~setInitialValues.
+
+    "ESTE MÉTODO SE EJECUTA CUANDO SE CREA EL INCIDENTE Y AGREGA AL HISTORIAL SU INICIO
     METHODS createInitialHistory FOR DETERMINE ON SAVE
       IMPORTING keys FOR Incident~createInitialHistory.
+
+    "MÉTODO QUE SIRVE PARA DAR CIERTAS CONDICIONES COMO EJEMPLO PORNER EN READONLY EN BASE A UNA CONDICIÓN
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR Incident RESULT result.
 
+    "METODO QUE PERMITE CAMBIAR EL ESTADO DEL INCIDENTE
     METHODS changeStatus FOR MODIFY
       IMPORTING keys FOR ACTION Incident~changeStatus RESULT result.
+    "VALIDACIONES PARA CREAR O MODIFICAR EL INCIDENTE
     METHODS validateFields FOR VALIDATE ON SAVE
       IMPORTING keys FOR Incident~validateFields.
 
 
 
 
-    "Métodos Helpers
+    "SE CREA EL MÉTODO get_next_history_id PARA OBTENER SIGUIENTE EL ID DEL HISTORIAL DEL INCIDENTE
     METHODS get_next_history_id
       IMPORTING iv_inc_uuid      TYPE sysuuid_x16
       RETURNING VALUE(rv_his_id) TYPE zde_his_id_ymir.
-
+    "SE CREA EL MÉTODO get_next_incident_id PARA OBTENER EL SIGUIENTE ID DEL INCIDENTE
     METHODS get_next_incident_id
       RETURNING VALUE(rv_next_id) TYPE zdt_inct_ymir-incident_id.
-
+    "SE CREA PARA OBTENER LA FECHA LOCAL
     METHODS get_local_date RETURNING VALUE(rv_local_date) TYPE zde_creation_date_ymir.
 
 
@@ -38,7 +49,11 @@ ENDCLASS.
 CLASS lhc_Indicent IMPLEMENTATION.
 
   METHOD get_instance_authorizations.
+
+    " OBTENER EL USUARIO DESDE LA APLICACIÓN
     DATA(current_user) = cl_abap_context_info=>get_user_technical_name( ).
+
+
     CONSTANTS cv_admin TYPE string VALUE 'CB9980000302'.
 
 
@@ -48,21 +63,26 @@ CLASS lhc_Indicent IMPLEMENTATION.
       WITH CORRESPONDING #( keys )
       RESULT DATA(lt_incidents).
 
+
+
+
     LOOP AT lt_incidents INTO DATA(ls_incident).
 
+      "CONDICIÓN QUE PERMITE DETERMINAR SI UN USUARIO PUEDE ACTUALIZAR LOS REGISTROS
       DATA(lv_is_authorized) = COND #(
           WHEN current_user = cv_admin
           THEN if_abap_behv=>auth-allowed
           ELSE if_abap_behv=>auth-unauthorized ).
 
 
-
+      "CONDICIÓN QUE PERMITE SI UN USUARIO PUEDE ELIMINAR LOS REGISTROS
       DATA(lv_delete_allowed) = COND #(
           WHEN lv_is_authorized = if_abap_behv=>auth-allowed AND ls_incident-Status = zcl_inct_status_constants_ymir=>status-open
           THEN if_abap_behv=>auth-allowed
           ELSE if_abap_behv=>auth-unauthorized ).
 
 
+      " SE AGREGA LAS AUTORIZACIONES PARA EL UPDATE Y DELETE EN BASE A LAS CONDICIONES
       APPEND VALUE #( %tky    = ls_incident-%tky
                       %update = lv_is_authorized
                       %delete = lv_delete_allowed
@@ -72,8 +92,11 @@ CLASS lhc_Indicent IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_global_authorizations.
+
+
     DATA(current_user) = cl_abap_context_info=>get_user_technical_name( ).
     CONSTANTS cv_admin TYPE string VALUE 'CB9980000302'.
+
 
     IF requested_authorizations-%update      = if_abap_behv=>mk-on .
 
@@ -90,6 +113,7 @@ CLASS lhc_Indicent IMPLEMENTATION.
 
   METHOD setInitialValues.
 
+    " SE LEE LOS INCIDENTES
     READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
       ENTITY Incident
       FIELDS ( IncidentId Status CreationDate )
@@ -97,9 +121,12 @@ CLASS lhc_Indicent IMPLEMENTATION.
       RESULT DATA(incidents).
 
     DELETE incidents WHERE IncidentId IS NOT INITIAL.
+
     CHECK incidents IS NOT INITIAL.
 
 
+    "SE ASIGNA LOS VALORES INICIALES PARA CUANDO SE QUIERE CREAR UN INCIDENTE, DONDE SE ASIGNA EL ID DEL INCIDENTE,
+    "SU ESTADO Y FECHA DE CREACIÓN
     MODIFY ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
       ENTITY Incident
       UPDATE FIELDS ( IncidentId Status CreationDate )
@@ -117,6 +144,8 @@ CLASS lhc_Indicent IMPLEMENTATION.
 
 
   METHOD createInitialHistory.
+
+
     READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
     ENTITY Incident
     ALL FIELDS WITH CORRESPONDING #( keys )
@@ -162,6 +191,7 @@ CLASS lhc_Indicent IMPLEMENTATION.
 
   METHOD get_instance_features.
 
+
     READ ENTITIES OF zdd_r_inct_ymir IN LOCAL MODE
       ENTITY Incident
         FIELDS ( IncidentId )
@@ -174,6 +204,8 @@ CLASS lhc_Indicent IMPLEMENTATION.
     DELETE lt_incidents_to_check WHERE IncidentId IS INITIAL.
 
     DATA(lt_existing_ids_in_db) = lt_incidents_to_check.
+
+
 
 
     IF lt_existing_ids_in_db IS NOT INITIAL.
@@ -444,9 +476,9 @@ CLASS lhc_Indicent IMPLEMENTATION.
 
 
 
-   SELECT PriorityCode
-  FROM zdd_priority_vh_ymir
-  INTO TABLE @DATA(lt_priorities).
+    SELECT PriorityCode
+   FROM zdd_priority_vh_ymir
+   INTO TABLE @DATA(lt_priorities).
     SORT lt_priorities BY PriorityCode.
 
 
@@ -456,10 +488,10 @@ CLASS lhc_Indicent IMPLEMENTATION.
       DATA(lv_is_create) = abap_true.
 
 
-        SELECT SINGLE FROM ZDD_INCT_H_YMIR
-        FIELDS @if_abap_behv=>mk-on
-        WHERE IncUuid = @ls_incident-IncUUID
-        INTO @DATA(lv_exists_in_db).
+      SELECT SINGLE FROM zdd_inct_h_ymir
+      FIELDS @if_abap_behv=>mk-on
+      WHERE IncUuid = @ls_incident-IncUUID
+      INTO @DATA(lv_exists_in_db).
 
 
       IF sy-subrc = 0.
@@ -582,7 +614,7 @@ CLASS lhc_Indicent IMPLEMENTATION.
         ENDIF.
       ELSE.
 
-         IF ls_incident-ChangedDate IS INITIAL.
+        IF ls_incident-ChangedDate IS INITIAL.
           APPEND VALUE #( %tky = ls_incident-%tky ) TO failed-incident.
 
           APPEND VALUE #(

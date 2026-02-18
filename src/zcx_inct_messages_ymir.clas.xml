@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCX_INCT_MESSAGES_YMIR</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>clase para manejar los mensajes de validaciones</DESCRIPT>
+    <DESCRIPT>Esta clase sirve para los mensajes de los incidentes</DESCRIPT>
     <CATEGORY>40</CATEGORY>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>

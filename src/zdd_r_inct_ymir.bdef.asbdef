@@ -14,33 +14,29 @@
 
 
     {
+
+      //ASIGNAR EL UUID DE LA CLAVE PRINCIPAL SI NO LO ENVÍA EL UI
       field ( numbering : managed, readonly ) IncUUID;
 
 
-
+    //CAMPOS DE SOLO LECTURA PARA CONTROL DE VERSIONES Y AUTORÍA
       field ( readonly )
-
-
-
       LocalCreatedBy,
-
       LocalCreatedAt,
-
       LocalLastChangedBy,
-
       LocalLastChangedAt,
-
       LastChangedAt;
 
 
-
+     //VALIDACIONES DE LOS CAMPOS EN CREATE Y UPDATE
       validation validateFields on save { create; update; field Title, Description, Priority, CreationDate, ChangedDate; }
 
 
-
+      //CAMPOS MANDATORIOS Y DE SOLO LECTURA
       field ( mandatory   ) Title, Description, Priority;
       field ( readonly ) IncidentId, Status;
 
+      //CAMPOS DE SOLO LECTURA QUE SE ASIGNAN AUTOM
       field ( features : instance ) CreationDate, ChangedDate;
 
       create;
@@ -49,20 +45,22 @@
 
       delete;
 
-
+    //ASOCIACIÓN PARA HISTÓRICO DE CAMBIOS DE ESTATUS
       association _History { create; with draft; }
 
-
+    //SE AFECTUA CUANDO SE EJECUTA EL CAMBIO DE ESTADO
       side effects
       {
         action changeStatus affects entity _History;
       }
+
+      //ACCION DE CAMBIAR ESTADO
       action ( features : instance, authorization : update ) changeStatus
         parameter ZDD_AE_CHANGE_STATUS_YMIR
         result [1] $self;
 
 
-
+    //DETERMINACION PARA ASIGNAR VALORES INICIALES EN CREATE Y PARA CREAR EL HISTÓRICO DE CAMBIOS DE ESTATUS
       determination setInitialValues on modify { create; }
       determination createInitialHistory on save { create; }
 
@@ -76,13 +74,15 @@
 
       draft action Resume;
 
+
+      //SE EJECUTA LA VALIDACIÓN DE CAMPOS EN SAVE CUANDO SE CREA O SE ACTUALIZA UN INCIDENTE
       draft determine action Prepare
       {
         validation validateFields;
       }
 
 
-
+    //MAPEO DEL DRAFT DE LA TABLA PRINCIPAL
       mapping for zdt_inct_ymir corresponding
         {
           IncUUID            = inc_uuid;
@@ -102,6 +102,7 @@
 
     }
 
+// Comportamiento para el histórico de cambios de estatus del incidente
     define behavior for ZDD_INCT_H_YMIR alias History
     persistent table zdt_inct_h_ymir
     draft table zdtinct_h_ymir_d

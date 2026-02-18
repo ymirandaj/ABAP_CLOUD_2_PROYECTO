@@ -15,11 +15,12 @@
 @Consumption.ranked: true
 @VDM.viewType: #BASIC
 
-// Mejora: Agregar metadatos para UI semántica
 @UI.headerInfo: {
     typeName: 'State',
     typeNamePlural: 'States'
 }
+
+//Definición de la vista de entidad para la ayuda de búsqueda de estados
 define view entity ZDD_STATUS_VH_YMIR as select from zdt_status_ymir
 {
     @UI.facet: [ { id: 'status', type: #IDENTIFICATION_REFERENCE } ]

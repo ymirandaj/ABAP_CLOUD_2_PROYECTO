@@ -1,4 +1,5 @@
 @EndUserText.label: 'Change State'
+//Entidad abstracta que nos ayuda para el popup del cambio de estado 
 define abstract entity ZDD_AE_CHANGE_STATUS_YMIR
 {
   

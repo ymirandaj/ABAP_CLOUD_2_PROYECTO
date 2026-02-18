@@ -1,10 +1,12 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'CDS root incidents'
 @Metadata.ignorePropagatedAnnotations: true
+
+//VISTA DE ENTIDAD RAIZ PARA INCIDENTES
 define root view entity ZDD_R_INCT_YMIR as select from zdt_inct_ymir
-composition [0..*] of  ZDD_INCT_H_YMIR as _History 
-association [1..1] to ZDD_STATUS_VH_YMIR  as _Status on _Status.StatusCode = $projection.Status 
-association [1..1] to ZDD_PRIORITY_VH_YMIR as _Priority on _Priority.PriorityCode = $projection.Priority
+composition [0..*] of  ZDD_INCT_H_YMIR as _History //Composición de la vista de historia de incidentes
+association [0..1] to ZDD_STATUS_VH_YMIR  as _Status on _Status.StatusCode = $projection.Status 
+association [0..1] to ZDD_PRIORITY_VH_YMIR as _Priority on _Priority.PriorityCode = $projection.Priority
 {
     key inc_uuid as IncUuid,
     incident_id as IncidentId,
