@@ -15,7 +15,9 @@ ENDCLASS.
 
 
 
-CLASS zcl_insert_data_ymir IMPLEMENTATION.
+CLASS ZCL_INSERT_DATA_YMIR IMPLEMENTATION.
+
+
   METHOD if_oo_adt_classrun~main.
 
     "insert_statuses( out ).
@@ -27,6 +29,7 @@ CLASS zcl_insert_data_ymir IMPLEMENTATION.
 
 
   ENDMETHOD.
+
 
   METHOD insert_priorities.
 
@@ -54,6 +57,7 @@ CLASS zcl_insert_data_ymir IMPLEMENTATION.
     ENDTRY.
 
   ENDMETHOD.
+
 
   METHOD insert_statuses.
     DATA lt_status TYPE STANDARD TABLE OF zdt_status_ymir.
@@ -85,5 +89,4 @@ CLASS zcl_insert_data_ymir IMPLEMENTATION.
 
 
   ENDMETHOD.
-
 ENDCLASS.

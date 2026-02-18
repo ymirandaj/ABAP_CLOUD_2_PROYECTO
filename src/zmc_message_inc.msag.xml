@@ -66,7 +66,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>ZMC_MESSAGE_INC</ARBGB>
      <MSGNR>010</MSGNR>
-     <TEXT>El estado &amp;1 no es válido para la transición</TEXT>
+     <TEXT>El estado &amp;1 no es válido.</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -126,7 +126,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>ZMC_MESSAGE_INC</ARBGB>
      <MSGNR>020</MSGNR>
-     <TEXT>Transición de estado no permitida de &amp;1 a &amp;2</TEXT>
+     <TEXT>Cambio de estado no permitida de &amp;1 a &amp;2</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -144,7 +144,25 @@
      <SPRSL>E</SPRSL>
      <ARBGB>ZMC_MESSAGE_INC</ARBGB>
      <MSGNR>023</MSGNR>
-     <TEXT>El estado no se puede cambiar a completado o cerrado si aun está pendient</TEXT>
+     <TEXT>El estado no se puede cambiar si están cerrado, cancelado y completado.</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>024</MSGNR>
+     <TEXT>Debe ingresar una fecha de modificación</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>025</MSGNR>
+     <TEXT>La fecha de modificación debe ser mayor a la fecha de creación</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INC</ARBGB>
+     <MSGNR>026</MSGNR>
+     <TEXT>La fecha de modificación no puede ser mayor a la fecha actual</TEXT>
     </T100>
    </T100>
   </asx:values>

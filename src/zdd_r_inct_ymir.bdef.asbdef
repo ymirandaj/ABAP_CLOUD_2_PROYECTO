@@ -34,8 +34,7 @@
 
 
 
-      // 1. Declarar la validación indicando qué campos la disparan
-      validation validateFields on save { create; update; field Title, Description, Priority; }
+      validation validateFields on save { create; update; field Title, Description, Priority, CreationDate, ChangedDate; }
 
 
 

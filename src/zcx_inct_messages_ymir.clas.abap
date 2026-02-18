@@ -12,7 +12,7 @@ CLASS zcx_inct_messages_ymir DEFINITION
     CONSTANTS:
       gc_msgid TYPE symsgid VALUE 'ZMC_MESSAGE_INC',
 
-      " Mensajes de validación de campos
+
       BEGIN OF field_required,
         msgid TYPE symsgid VALUE 'ZMC_MESSAGE_INC',
         msgno TYPE symsgno VALUE '001',
@@ -216,7 +216,31 @@ CLASS zcx_inct_messages_ymir DEFINITION
         attr2 TYPE scx_attrname VALUE '',
         attr3 TYPE scx_attrname VALUE '',
         attr4 TYPE scx_attrname VALUE '',
-      END OF state_pending_validate.
+      END OF state_pending_validate,
+      BEGIN OF enter_changed_date,
+        msgid TYPE symsgid VALUE 'ZMC_MESSAGE_INC',
+        msgno TYPE symsgno VALUE '024',
+        attr1 TYPE scx_attrname VALUE '',
+        attr2 TYPE scx_attrname VALUE '',
+        attr3 TYPE scx_attrname VALUE '',
+        attr4 TYPE scx_attrname VALUE '',
+      END OF enter_changed_date,
+      BEGIN OF changed_date_invalid,
+        msgid TYPE symsgid VALUE 'ZMC_MESSAGE_INC',
+        msgno TYPE symsgno VALUE '026',
+        attr1 TYPE scx_attrname VALUE '',
+        attr2 TYPE scx_attrname VALUE '',
+        attr3 TYPE scx_attrname VALUE '',
+        attr4 TYPE scx_attrname VALUE '',
+      END OF changed_date_invalid,
+      BEGIN OF changed_date_bcd,
+        msgid TYPE symsgid VALUE 'ZMC_MESSAGE_INC',
+        msgno TYPE symsgno VALUE '025',
+        attr1 TYPE scx_attrname VALUE '',
+        attr2 TYPE scx_attrname VALUE '',
+        attr3 TYPE scx_attrname VALUE '',
+        attr4 TYPE scx_attrname VALUE '',
+      END OF changed_date_bcd.
 
     METHODS constructor
       IMPORTING
@@ -266,7 +290,10 @@ CLASS zcx_inct_messages_ymir DEFINITION
   PRIVATE SECTION.
 ENDCLASS.
 
-CLASS zcx_inct_messages_ymir IMPLEMENTATION.
+
+
+CLASS ZCX_INCT_MESSAGES_YMIR IMPLEMENTATION.
+
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.
     super->constructor( previous = previous ).
@@ -299,5 +326,4 @@ CLASS zcx_inct_messages_ymir IMPLEMENTATION.
       if_t100_message~t100key = textid.
     ENDIF.
   ENDMETHOD.
-
 ENDCLASS.
